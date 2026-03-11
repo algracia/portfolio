@@ -1,17 +1,7 @@
-# OS / editor
+node_modules
+dist
+.vscode
 .DS_Store
-Thumbs.db
-.vscode/
-.idea/
-
-# Logs
-*.log
-
-# Environment files
 .env
 .env.*
-
-# Build / cache
-dist/
-build/
-.cache/
+*.log
