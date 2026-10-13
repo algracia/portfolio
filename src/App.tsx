@@ -1,118 +1,101 @@
 import { useEffect, useState } from "react";
 import { Link, Route, Routes, useLocation } from "react-router-dom";
-import { type Language, profileLinks, translations } from "./data/site";
+import { cvDocuments, profile, translations, type Language } from "./data/site";
 import HomePage from "./pages/HomePage";
 import ProjectDetailPage from "./pages/ProjectDetailPage";
 import { applySeoMetadata } from "./seo/metadata";
 
 function App() {
-  const [language, setLanguage] = useState<Language>("en");
-  const content = translations[language];
   const location = useLocation();
-
-  useEffect(() => {
-    if (location.hash) {
-      const target = document.getElementById(location.hash.slice(1));
-      target?.scrollIntoView();
-      return;
-    }
-
-    window.scrollTo({ top: 0, left: 0 });
-  }, [location.pathname, location.hash]);
+  const language: Language = location.pathname === "/es" || location.pathname.startsWith("/es/") ? "es" : "en";
+  const content = translations[language];
+  const [menuOpen, setMenuOpen] = useState(false);
+  const base = language === "es" ? "/es" : "/";
+  const sectionPath = (id: string) => `${base === "/" ? "/" : base}#${id}`;
+  const projectSlug = location.pathname.match(/^\/(?:es\/)?projects\/([^/]+)\/?$/)?.[1];
+  const project = content.projects.find((item) => item.slug === projectSlug);
+  const cv = cvDocuments[language];
 
   useEffect(() => {
     document.documentElement.lang = language;
-  }, [language]);
+    setMenuOpen(false);
+    if (location.hash) {
+      requestAnimationFrame(() => document.getElementById(location.hash.slice(1))?.scrollIntoView());
+    } else {
+      window.scrollTo(0, 0);
+    }
+  }, [language, location.pathname, location.hash, location.key]);
 
   useEffect(() => {
-    const homeTitle =
-      language === "en"
-        ? `${content.profile.name} | Prototype & Embedded Systems Portfolio`
-        : `${content.profile.name} | Portafolio de Prototipos y Sistemas Embebidos`;
-    const homeDescription =
-      language === "en"
-        ? "Portfolio of Alberto Gracia Martelo focused on CAD, embedded firmware, power electronics and prototype engineering."
-        : "Portafolio de Alberto Gracia Martelo enfocado en CAD, firmware embebido, electronica de potencia e ingenieria de prototipos.";
-
-    if (location.pathname === "/") {
-      applySeoMetadata({
-        title: homeTitle,
-        description: homeDescription,
-        urlPath: location.pathname,
-        type: "website"
-      });
-      return;
-    }
-
-    const projectSlug = location.pathname.match(/^\/projects\/([^/]+)$/)?.[1];
-    if (projectSlug) {
-      const project = content.projects.find((item) => item.slug === decodeURIComponent(projectSlug));
-      if (project) {
-        applySeoMetadata({
-          title: `${project.title} | ${content.profile.name}`,
-          description: project.summary,
-          urlPath: location.pathname,
-          image: project.coverImage.src,
-          type: "article"
-        });
-        return;
-      }
-    }
-
+    const isHome = location.pathname === "/" || location.pathname === "/es";
+    const title = project
+      ? `${project.title} | ${profile.name}`
+      : isHome
+        ? language === "en"
+          ? `${profile.name} | IoT & Embedded Systems Engineer`
+          : `${profile.name} | Ingeniero IoT y de Sistemas Embebidos`
+        : `${content.actions.missing} | ${profile.name}`;
+    const description = project?.summary ?? (!isHome ? content.actions.missingText : language === "en"
+      ? "Alberto Gracia Martelo is an Engineering Physicist building IoT, embedded, Edge AI and physical systems through hardware/software integration."
+      : "Alberto Gracia Martelo es Ingeniero Físico. Desarrolla sistemas IoT, embebidos y Edge AI mediante integración de hardware y software.");
     applySeoMetadata({
-      title: `${content.projectDetail.notFoundTitle} | ${content.profile.name}`,
-      description: content.projectDetail.notFoundText,
+      title,
+      description,
       urlPath: location.pathname,
-      type: "website"
+      image: project?.cover?.src,
+      type: project ? "article" : "website",
+      language,
+      noIndex: location.pathname !== "/" && location.pathname !== "/es" && !project
     });
-  }, [location.pathname, language, content]);
+  }, [language, location.pathname, project]);
+
+  const languagePath = (target: Language) => {
+    const slug = projectSlug ? `/projects/${projectSlug}` : "";
+    return target === "es" ? `/es${slug}` : slug || "/";
+  };
 
   return (
-    <div className="site-shell">
-      <header className="topbar">
-        <Link to="/" className="brand">
-          {content.brand}
-        </Link>
-
-        <nav className="nav">
-          <Link to="/#projects">{content.nav.projects}</Link>
-          <Link to="/#capabilities">{content.nav.capabilities}</Link>
-          <Link to="/#experience">{content.nav.experience}</Link>
-          <Link to="/#contact">{content.nav.contact}</Link>
-        </nav>
-
-        <div className="topbar__actions">
-          <div className="lang-toggle" role="group" aria-label={content.nav.languageToggleAria}>
-            <button
-              type="button"
-              className={`lang-toggle__button ${language === "en" ? "is-active" : ""}`}
-              aria-pressed={language === "en"}
-              onClick={() => setLanguage("en")}
-            >
-              {content.nav.english}
-            </button>
-            <button
-              type="button"
-              className={`lang-toggle__button ${language === "es" ? "is-active" : ""}`}
-              aria-pressed={language === "es"}
-              onClick={() => setLanguage("es")}
-            >
-              {content.nav.spanish}
-            </button>
+    <>
+      <a className="skip-link" href="#main">{language === "en" ? "Skip to content" : "Saltar al contenido"}</a>
+      <header className="site-header">
+        <div className="container site-header__inner">
+          <Link className="brand" to={base} aria-label={`${profile.name} · ${language === "en" ? "Home" : "Inicio"}`}>
+            <span className="brand__mark">AG<span>.</span></span>
+            <span className="brand__name">{profile.name}</span>
+          </Link>
+          <button className="menu-toggle" type="button" aria-expanded={menuOpen} aria-controls="main-navigation" onClick={() => setMenuOpen(!menuOpen)}>
+            {menuOpen ? content.nav.close : content.nav.menu}<span aria-hidden="true">{menuOpen ? " ×" : " +"}</span>
+          </button>
+          <nav id="main-navigation" className={`site-nav ${menuOpen ? "is-open" : ""}`} aria-label={language === "en" ? "Main navigation" : "Navegación principal"}>
+            <Link to={sectionPath("work")}>{content.nav.work}</Link>
+            <Link to={sectionPath("further-work")}>{content.nav.additional}</Link>
+            <Link to={sectionPath("experience")}>{content.nav.experience}</Link>
+            <Link to={sectionPath("stack")}>{content.nav.stack}</Link>
+            <Link to={sectionPath("education")}>{content.nav.education}</Link>
+            <Link to={sectionPath("contact")}>{content.nav.contact}</Link>
+            {cv.available && <a className="mobile-cv" href={cv.path} target="_blank" rel="noopener noreferrer">{content.actions.cv} ↗</a>}
+          </nav>
+          <div className="header-tools">
+            <div className="language-switch" role="group" aria-label={content.nav.language}>
+              <Link to={languagePath("en")} lang="en" aria-current={language === "en" ? "page" : undefined}>EN</Link>
+              <span aria-hidden="true">/</span>
+              <Link to={languagePath("es")} lang="es" aria-current={language === "es" ? "page" : undefined}>ES</Link>
+            </div>
+            {cv.available && <a className="header-cv" href={cv.path} target="_blank" rel="noopener noreferrer">{content.actions.cv}<span aria-hidden="true"> ↗</span></a>}
           </div>
-
-          <a className="button button--ghost" href={profileLinks.cv} target="_blank" rel="noreferrer">
-            {content.nav.cv}
-          </a>
         </div>
       </header>
-
       <Routes>
-        <Route path="/" element={<HomePage content={content} />} />
-        <Route path="/projects/:slug" element={<ProjectDetailPage content={content} />} />
-        <Route path="*" element={<ProjectDetailPage content={content} />} />
+        <Route path="/" element={<HomePage language={language} content={content} />} />
+        <Route path="/es" element={<HomePage language={language} content={content} />} />
+        <Route path="/projects/:slug" element={<ProjectDetailPage language={language} content={content} />} />
+        <Route path="/es/projects/:slug" element={<ProjectDetailPage language={language} content={content} />} />
+        <Route path="*" element={<ProjectDetailPage language={language} content={content} />} />
       </Routes>
-    </div>
+      <footer className="site-footer">
+        <div className="container site-footer__inner"><span>© {new Date().getFullYear()} {profile.name}</span><span>{content.hero.location}</span><a href="#main">↑ {language === "en" ? "Top" : "Inicio"}</a></div>
+      </footer>
+    </>
   );
 }
 

@@ -1,133 +1,55 @@
 import { Link, useParams } from "react-router-dom";
-import { type SiteTranslation } from "../data/site";
+import ProjectMedia from "../components/ProjectMedia";
+import { type Language, type SiteTranslation } from "../data/site";
 
-type ProjectDetailPageProps = {
-  content: SiteTranslation;
-};
+type Props = { language: Language; content: SiteTranslation };
 
-function ProjectDetailPage({ content }: ProjectDetailPageProps) {
+export default function ProjectDetailPage({ language, content }: Props) {
   const { slug } = useParams();
   const project = content.projects.find((item) => item.slug === slug);
+  const back = `${language === "es" ? "/es" : "/"}#work`;
 
   if (!project) {
-    return (
-      <main>
-        <section className="section detail-page">
-          <article className="detail-panel detail-panel--wide">
-            <p className="eyebrow">{content.sections.projects.eyebrow}</p>
-            <h2>{content.projectDetail.notFoundTitle}</h2>
-            <p>{content.projectDetail.notFoundText}</p>
-            <Link className="button" to="/">
-              {content.actions.backHome}
-            </Link>
-          </article>
-        </section>
-      </main>
-    );
+    return <main id="main" className="container detail-page detail-page--missing"><h1>{content.actions.missing}</h1><p>{content.actions.missingText}</p><Link className="text-link" to={back}>← {content.actions.back}</Link></main>;
   }
 
+  const hasGalleryMedia = Boolean(project.gallery?.length || project.videos?.length);
+
   return (
-    <main>
-      <section className="section detail-page">
-        <div className="detail-page__top">
-          <Link className="button button--ghost" to="/#projects">
-            {content.actions.backToProjects}
-          </Link>
-        </div>
-
-        <article className="project-card project-card--detail">
-          <img src={project.coverImage.src} alt={project.coverImage.alt} className="project-card__image" />
-          <div className="project-card__body">
-            <div className="project-card__meta">
-              <span>{project.category}</span>
-              <span>{project.period}</span>
-            </div>
-
-            <h1 className="detail-title">{project.title}</h1>
-            <p>{project.summary}</p>
-
-            <div className="detail-panel">
-              <p className="eyebrow">{content.projectDetail.introLabel}</p>
-              <p>{project.detail.intro}</p>
-            </div>
-
-            {project.resources && (
-              <div>
-                <h3 className="detail-heading">{content.projectDetail.pdfResources}</h3>
-                <div className="project-card__links">
-                  {project.resources.map((resource) => (
-                    <a key={resource.label} href={resource.href} download>
-                      {resource.label}
-                    </a>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {project.externalLinks && (
-              <div>
-                <h3 className="detail-heading">{content.projectDetail.externalLinks}</h3>
-                <div className="project-card__links">
-                  {project.externalLinks.map((link) => (
-                    <a
-                      key={link.label}
-                      href={link.href}
-                      target={link.external ? "_blank" : undefined}
-                      rel={link.external ? "noreferrer" : undefined}
-                    >
-                      {link.label}
-                    </a>
-                  ))}
-                </div>
-              </div>
-            )}
+    <main id="main" className="detail-page">
+      <div className="container detail-page__intro">
+        <Link className="back-link" to={back}>← {content.actions.back}</Link>
+        <div className="detail-page__meta"><span>{project.number} / {project.total}</span><span>{project.category}</span><span>{project.period}</span></div>
+        <h1>{project.title}</h1>
+        <p className="detail-page__summary">{project.summary}</p>
+        <a className="detail-page__gallery-link" href="#gallery">{content.actions.gallery}<span aria-hidden="true">↓</span></a>
+      </div>
+      <div className="container detail-page__content">
+        <section className="detail-block" aria-labelledby="contribution-title"><span className="section-index">01</span><h2 id="contribution-title">{content.headings.contribution}</h2><p>{project.contribution}</p></section>
+        <section className="detail-block" aria-labelledby="scope-title"><span className="section-index">02</span><h2 id="scope-title">{content.headings.approach}</h2><ul>{project.scope.map((point) => <li key={point}>{point}</li>)}</ul></section>
+        <section className="detail-block" aria-labelledby="stack-title"><span className="section-index">03</span><h2 id="stack-title">{content.headings.technical}</h2><p>{project.stack.join(" · ")}</p></section>
+        {project.resources && <section className="detail-block" aria-labelledby="project-resources-title">
+          <span className="section-index">04</span><h2 id="project-resources-title">{project.resourceHeading ?? content.actions.resources}</h2>
+          <div className="resource-links">
+            {project.resources?.map((item) => <a key={item.href} href={item.href} target="_blank" rel="noopener noreferrer">{item.label}<span aria-hidden="true"> ↗</span></a>)}
           </div>
-        </article>
-
-        <div className="detail-grid">
-          <article className="detail-panel">
-            <h3 className="detail-heading">{content.projectDetail.keyHighlights}</h3>
-            <ul className="check-list">
-              {project.highlights.map((highlight) => (
-                <li key={highlight}>{highlight}</li>
-              ))}
-            </ul>
-          </article>
-
-          <article className="detail-panel">
-            <h3 className="detail-heading">{content.projectDetail.techStack}</h3>
-            <div className="tag-list">
-              {project.stack.map((item) => (
-                <span key={item}>{item}</span>
-              ))}
-            </div>
-          </article>
+        </section>}
+      </div>
+      <section id="gallery" className="container detail-gallery" aria-labelledby="gallery-title">
+        <h2 id="gallery-title">{content.headings.images}</h2>
+        <div className={`detail-gallery__grid${project.slug === "chessproject" ? " detail-gallery__grid--chess" : ""}`}>
+          {!hasGalleryMedia && <figure><ProjectMedia project={project} pending={content.actions.imagePending} pendingDetail={content.actions.imagePendingDetail} className="project-media--gallery" eager /></figure>}
+          {project.gallery?.map((image) => <figure key={image.src} className={image.portrait ? "detail-gallery__portrait" : undefined}><img src={image.src} alt={image.alt} loading="lazy" /><figcaption>{image.caption}</figcaption></figure>)}
+          {project.videos?.map((video) => <figure key={video.src} className={video.portrait ? "detail-gallery__portrait" : undefined}>
+            <video controls preload="metadata" playsInline poster={video.poster} aria-label={video.label}>
+              <source src={video.src} type="video/mp4" />
+              <a href={video.src}>{video.label}</a>
+            </video>
+            <figcaption>{video.label}</figcaption>
+          </figure>)}
         </div>
-
-        <div className="detail-grid">
-          {project.detail.sections.map((section) => (
-            <article key={section.title} className="detail-panel">
-              <h3 className="detail-heading">{section.title}</h3>
-              <p>{section.text}</p>
-            </article>
-          ))}
-        </div>
-
-        {project.gallery && (
-          <section>
-            <h3 className="detail-heading detail-heading--section">{content.projectDetail.gallery}</h3>
-            <div className="gallery-grid">
-              {project.gallery.map((asset) => (
-                <figure key={asset.src} className="gallery-card">
-                  <img src={asset.src} alt={asset.alt} />
-                </figure>
-              ))}
-            </div>
-          </section>
-        )}
       </section>
+      <div className="container detail-page__end"><Link className="text-link" to={back}>← {content.actions.back}</Link></div>
     </main>
   );
 }
-
-export default ProjectDetailPage;

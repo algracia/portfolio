@@ -1,60 +1,34 @@
-# Alberto portfolio starter
+# Alberto Gracia Martelo — engineering portfolio
 
-Initial portfolio starter oriented to:
-- CAD and manufacturable drawings
-- embedded firmware
-- PCB / power electronics
-- prototype engineering
+React, TypeScript and Vite portfolio for [albertogracia.dev](https://albertogracia.dev). English is the default at `/`; Spanish lives at `/es`. Project case studies use `/projects/:slug` and `/es/projects/:slug`.
 
-## Local start
+## Local development
+
 ```bash
-npm install
+npm ci
 npm run dev
-```
-
-## Build
-```bash
 npm run build
 ```
 
-## Placeholder assets to replace
-Current project data uses these placeholder paths. Replace them with your final files using the same names, or update `src/data/site.ts` to your preferred names.
+Cloudflare Pages: production branch `main`, build command `npm run build`, output `dist`. The SPA fallback is in `public/_redirects`. The build does not publish by itself.
 
-- `/public/assets/chessproject-cover-final.jpg`
-- `/public/assets/chessproject-gallery-01.jpg`
-- `/public/assets/chessproject-gallery-02.jpg`
-- `/public/assets/zvs-inverter-cover-final.jpg`
-- `/public/assets/zvs-inverter-gallery-01.jpg`
-- `/public/assets/zvs-inverter-gallery-02.jpg`
-- `/public/assets/cad-assemblies-cover-final.jpg`
-- `/public/assets/cad-assemblies-gallery-01.jpg`
-- `/public/assets/cad-assemblies-gallery-02.jpg`
-- `/public/docs/chessproject-technical-brief.pdf`
-- `/public/docs/chessproject-electromechanical-overview.pdf`
-- `/public/docs/zvs-inverter-design-report.pdf`
-- `/public/docs/zvs-inverter-validation-notes.pdf`
-- `/public/docs/cad-assemblies-drawing-package.pdf`
-- `/public/docs/cad-assemblies-bom-documentation.pdf`
+## Content and project images
 
-## Cloudflare Pages
-Recommended framework choice: React + Vite.
-Typical Pages configuration:
-- Production branch: `main`
-- Build command: `npm run build`
-- Output directory: `dist`
-- SPA fallback redirects: `public/_redirects` (already included as `/* /index.html 200`)
+General bilingual copy, experience, capabilities and CV availability are in `src/data/site.ts`. Project copy and media live in `src/data/projects.ts`. A project without a `cover` gets a designed text fallback. To publish a real project image, add it under `public/assets` and set its `cover` in the project media registry. Gallery images are optional. Use actual project images; no synthetic imagery is required.
 
-## Contact form placeholder
-- Lightweight form submissions are configured through `contactFormConfig` in `src/data/site.ts`.
-- Default placeholder endpoint: `https://formspree.io/f/your-form-id`
-- Replace it with your real external form service endpoint before production use.
+Existing public assets cover the ChessProject technical overview and CAD assemblies. The CAD detail page has two assembly drawings and five local MP4 videos in one gallery; its homepage cover remains the wafer dispenser drawing. The publishable videos and their real-frame posters are in `public/assets`. Keep each video under Cloudflare Pages' 25 MiB per-file limit. Source recordings in `Multimedia/` are local inputs and are ignored by Git.
 
-## Next improvements
-1. Add a bilingual toggle (EN/ES).
-2. Add a dedicated project page for ChessProject.
-3. Replace placeholder / simplified assets with final curated visuals.
-4. Add a downloadable one-page portfolio PDF.
-5. Add custom favicon and Open Graph image.
+ChessProject uses a real prototype photograph as its cover. Its gallery contains two local MP4 demonstrations and the mechanical CAD video shared with the CAD gallery. Technical details links directly to `/docs/ChessProject.pdf`.
 
-## Prompt ideas for desktop coding assistant
-See `PROMPTS.md`.
+## CV files
+
+Place the current master CVs at:
+
+- `public/docs/Alberto_Gracia_CV_EN.pdf`
+- `public/docs/Alberto_Gracia_CV_ES.pdf`
+
+The header shows a CV link only for a language whose file is present and whose `available` flag in `src/data/site.ts` is `true`. Add each PDF, then enable its flag. No other component changes are needed.
+
+## SEO
+
+The HTML entry provides English home metadata. React updates title, canonical URL, social metadata and JSON-LD by route and language. `public/robots.txt` and `public/sitemap.xml` list both languages and all case studies. As a client-rendered SPA, route-specific social previews depend on crawlers executing JavaScript; static prerendering would be needed for guaranteed previews.

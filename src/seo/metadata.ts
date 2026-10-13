@@ -1,73 +1,70 @@
+import type { Language } from "../data/site";
+
 type SeoMetadata = {
   title: string;
   description: string;
-  urlPath?: string;
+  urlPath: string;
   image?: string;
-  type?: "website" | "article";
-  siteName?: string;
+  type: "website" | "article";
+  language: Language;
+  noIndex: boolean;
 };
 
-const DEFAULT_OG_IMAGE = "/assets/chessproject-overview.jpg";
-const DEFAULT_SITE_NAME = "Alberto Gracia Martelo Portfolio";
+const origin = "https://albertogracia.dev";
 
-function toAbsoluteUrl(pathOrUrl: string, origin: string) {
-  try {
-    return new URL(pathOrUrl, origin).toString();
-  } catch {
-    return pathOrUrl;
-  }
-}
-
-function upsertMetaTag(key: "name" | "property", value: string, content: string) {
-  const selector = `meta[${key}="${value}"]`;
+function setMeta(key: "name" | "property", name: string, content?: string) {
+  const selector = `meta[${key}="${name}"]`;
   let tag = document.head.querySelector<HTMLMetaElement>(selector);
-
+  if (!content) {
+    tag?.remove();
+    return;
+  }
   if (!tag) {
     tag = document.createElement("meta");
-    tag.setAttribute(key, value);
+    tag.setAttribute(key, name);
     document.head.appendChild(tag);
   }
-
-  tag.setAttribute("content", content);
+  tag.content = content;
 }
 
-function upsertCanonical(href: string) {
-  let canonical = document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]');
-
-  if (!canonical) {
-    canonical = document.createElement("link");
-    canonical.setAttribute("rel", "canonical");
-    document.head.appendChild(canonical);
-  }
-
-  canonical.setAttribute("href", href);
-}
-
-export function applySeoMetadata({
-  title,
-  description,
-  urlPath = window.location.pathname,
-  image = DEFAULT_OG_IMAGE,
-  type = "website",
-  siteName = DEFAULT_SITE_NAME
-}: SeoMetadata) {
-  const origin = window.location.origin;
-  const absoluteUrl = toAbsoluteUrl(urlPath, origin);
-  const absoluteImage = toAbsoluteUrl(image, origin);
-
+export function applySeoMetadata({ title, description, urlPath, image, type, language, noIndex }: SeoMetadata) {
+  const url = new URL(urlPath, origin).toString();
+  const imageUrl = image ? new URL(image, origin).toString() : undefined;
   document.title = title;
-  upsertCanonical(absoluteUrl);
+  document.querySelector<HTMLLinkElement>('link[rel="canonical"]')?.setAttribute("href", url);
+  setMeta("name", "description", description);
+  setMeta("name", "robots", noIndex ? "noindex, follow" : "index, follow, max-image-preview:large");
+  setMeta("name", "twitter:card", imageUrl ? "summary_large_image" : "summary");
+  setMeta("name", "twitter:title", title);
+  setMeta("name", "twitter:description", description);
+  setMeta("name", "twitter:image", imageUrl);
+  setMeta("property", "og:type", type);
+  setMeta("property", "og:site_name", "Alberto Gracia Martelo");
+  setMeta("property", "og:locale", language === "en" ? "en_US" : "es_CO");
+  setMeta("property", "og:title", title);
+  setMeta("property", "og:description", description);
+  setMeta("property", "og:url", url);
+  setMeta("property", "og:image", imageUrl);
+  setMeta("property", "og:image:alt", imageUrl ? title : undefined);
+  setMeta("name", "twitter:image:alt", imageUrl ? title : undefined);
 
-  upsertMetaTag("name", "description", description);
-  upsertMetaTag("name", "twitter:card", "summary_large_image");
-  upsertMetaTag("name", "twitter:title", title);
-  upsertMetaTag("name", "twitter:description", description);
-  upsertMetaTag("name", "twitter:image", absoluteImage);
-
-  upsertMetaTag("property", "og:type", type);
-  upsertMetaTag("property", "og:site_name", siteName);
-  upsertMetaTag("property", "og:title", title);
-  upsertMetaTag("property", "og:description", description);
-  upsertMetaTag("property", "og:url", absoluteUrl);
-  upsertMetaTag("property", "og:image", absoluteImage);
+  const structured = document.getElementById("structured-data");
+  if (structured) {
+    structured.textContent = JSON.stringify(type === "article" ? {
+      "@context": "https://schema.org",
+      "@type": "CreativeWork",
+      name: title,
+      description,
+      url,
+      author: { "@type": "Person", name: "Alberto Gracia Martelo" }
+    } : {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      name: "Alberto Gracia Martelo",
+      url: origin,
+      jobTitle: language === "en" ? "IoT & Embedded Systems Engineer" : "Ingeniero IoT y de Sistemas Embebidos",
+      description,
+      sameAs: ["https://github.com/algracia", "https://www.linkedin.com/in/alberto-gracia/"]
+    });
+  }
 }

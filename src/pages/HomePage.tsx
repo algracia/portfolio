@@ -1,223 +1,100 @@
 import { Link } from "react-router-dom";
-import ProjectCard from "../components/ProjectCard";
-import SectionIntro from "../components/SectionIntro";
-import { contactFormConfig, profileLinks, type SiteTranslation } from "../data/site";
+import ProjectMedia from "../components/ProjectMedia";
+import { profile, type Language, type SiteTranslation } from "../data/site";
+import type { Project } from "../data/projects";
 
-type HomePageProps = {
-  content: SiteTranslation;
-};
+type Props = { language: Language; content: SiteTranslation };
 
-function HomePage({ content }: HomePageProps) {
+function ProjectRow({ project, content, language }: { project: Project; content: SiteTranslation; language: Language }) {
+  const href = `${language === "es" ? "/es" : ""}/projects/${project.slug}`;
   return (
-    <main>
-      <section id="home" className="hero section">
-        <div className="hero__copy">
-          <p className="eyebrow">{content.hero.eyebrow}</p>
-          <h1>{content.profile.name}</h1>
-          <p className="hero__headline">{content.profile.headline}</p>
-          <p className="hero__text">{content.hero.text}</p>
+    <article className="work-row">
+      <div className="work-row__meta"><span>{project.number}</span><span>{project.category}</span></div>
+      <Link className="work-row__media-link" to={href} aria-label={`${content.actions.caseStudy}: ${project.title}`}>
+        <ProjectMedia project={project} pending={content.actions.imagePending} pendingDetail={content.actions.imagePendingDetail} />
+      </Link>
+      <div className="work-row__body">
+        <span className="small-label">{project.period}</span>
+        <h3><Link to={href}>{project.title}</Link></h3>
+        <p>{project.summary}</p>
+        <Link className="text-link" to={href}>{content.actions.caseStudy}<span aria-hidden="true"> ↗</span></Link>
+      </div>
+    </article>
+  );
+}
 
-          <div className="hero__actions">
-            <Link className="button" to="/#projects">
-              {content.hero.viewWork}
-            </Link>
-            <a className="button button--ghost" href={profileLinks.github} target="_blank" rel="noreferrer">
-              {content.nav.github}
-            </a>
-          </div>
-
-          <ul className="hero__meta">
-            <li>{content.profile.location}</li>
-            <li>
-              <a href={`mailto:${profileLinks.email}`}>{profileLinks.email}</a>
-            </li>
-            <li>
-              <a href={profileLinks.linkedin} target="_blank" rel="noreferrer">
-                {content.nav.linkedin}
-              </a>
-            </li>
-          </ul>
-        </div>
-
-        <div className="hero__panel">
-          <div className="hero-card hero-card--accent">
-            <span className="hero-card__label">{content.hero.positioningLabel}</span>
-            <strong>{content.hero.positioningTitle}</strong>
-            <p>{content.hero.positioningText}</p>
-          </div>
-
-          <div className="stats-grid">
-            {content.heroStats.map((item) => (
-              <article key={item.label} className="stat-card">
-                <span>{item.label}</span>
-                <strong>{item.value}</strong>
-              </article>
+export default function HomePage({ language, content }: Props) {
+  const selected = content.projects.filter((project) => !project.secondary);
+  const additional = content.projects.filter((project) => project.secondary);
+  return (
+    <main id="main">
+      <section className="hero container" aria-labelledby="hero-title">
+        <div className="hero__topline"><span>{content.hero.index}</span><span>{content.hero.location}</span></div>
+        <div className="hero__main">
+          <h1 id="hero-title" aria-label={content.hero.role.join(", ")}>
+            {content.hero.role.map((line) => (
+              <span className="hero__headline-line" key={line}>
+                <svg className="hero__arrow" viewBox="0 0 36 24" aria-hidden="true" focusable="false">
+                  <path d="M1 12h23" fill="none" stroke="currentColor" strokeWidth="2" />
+                  <path d="m22 4 12 8-12 8z" fill="currentColor" />
+                </svg>
+                <span className="hero__headline-text">{line}</span>
+              </span>
             ))}
+          </h1>
+          <div className="hero__aside">
+            <p>{content.hero.introduction}</p>
+            <Link className="text-link" to={`${language === "es" ? "/es" : "/"}#work`}>{content.actions.explore}<span aria-hidden="true"> ↓</span></Link>
           </div>
         </div>
-      </section>
-
-      <section id="projects" className="section">
-        <SectionIntro
-          eyebrow={content.sections.projects.eyebrow}
-          title={content.sections.projects.title}
-          text={content.sections.projects.text}
-        />
-
-        <div className="projects-grid">
-          {content.projects.map((project) => (
-            <ProjectCard key={project.slug} project={project} detailCta={content.actions.viewProjectDetails} />
-          ))}
+        <div className="hero__focus">
+          {content.hero.focus.map((item, index) => <div key={item}><span className="small-label">0{index + 1}</span><p>{item}</p></div>)}
         </div>
       </section>
 
-      <section id="engineering-evidence" className="section">
-        <SectionIntro
-          eyebrow={content.sections.evidence.eyebrow}
-          title={content.sections.evidence.title}
-          text={content.sections.evidence.text}
-        />
+      <section className="section container" id="work" aria-labelledby="work-title">
+        <div className="section-heading"><h2 id="work-title">{content.headings.work}</h2><p>{content.workIntro}</p></div>
+        <div className="work-list">{selected.map((project) => <ProjectRow key={project.slug} project={project} content={content} language={language} />)}</div>
+      </section>
 
-        <div className="capabilities-grid">
-          {content.engineeringEvidence.map((item) => (
-            <article key={item.title} className="capability-card">
-              <h3>{item.title}</h3>
-              <p>{item.text}</p>
+      <section className="section container further-work" id="further-work" aria-labelledby="additional-title">
+        <div className="section-heading"><h2 id="additional-title">{content.headings.additional}</h2><p>{content.additionalIntro}</p></div>
+        {additional.map((project) => <ProjectRow key={project.slug} project={project} content={content} language={language} />)}
+      </section>
+
+      <section className="section section--toned" id="experience" aria-labelledby="experience-title">
+        <div className="container">
+          <div className="section-heading"><h2 id="experience-title">{content.headings.experience}</h2></div>
+          <div className="experience-list">{content.experience.map((item) => (
+            <article className="experience-item" key={item.company}>
+              <div className="experience-item__when"><span>{item.period}</span><span>{item.location}</span></div>
+              <div className="experience-item__content"><h3>{item.role}</h3><p className="experience-item__company">{item.company}</p><ul>{item.work.map((point) => <li key={point}>{point}</li>)}</ul></div>
             </article>
-          ))}
+          ))}</div>
         </div>
       </section>
 
-      <section id="capabilities" className="section section--muted">
-        <SectionIntro
-          eyebrow={content.sections.capabilities.eyebrow}
-          title={content.sections.capabilities.title}
-          text={content.sections.capabilities.text}
-        />
+      <section className="section container" id="stack" aria-labelledby="stack-title">
+        <div className="section-heading"><h2 id="stack-title">{content.headings.stack}</h2></div>
+        <dl className="capability-list">{content.capabilities.map((item) => <div key={item.label}><dt>{item.label}</dt><dd>{item.detail}</dd></div>)}</dl>
+      </section>
 
-        <div className="capabilities-grid">
-          {content.capabilities.map((capability) => (
-            <article key={capability.title} className="capability-card">
-              <h3>{capability.title}</h3>
-              <p>{capability.text}</p>
-            </article>
-          ))}
+      <section className="section section--toned" id="education" aria-labelledby="education-title">
+        <div className="container credentials">
+          <div><h2 id="education-title">{content.headings.education}</h2><h3>{content.education.degree}</h3><p>{content.education.institution}</p><p className="muted">{content.education.detail}</p><p className="muted">{content.education.second}</p></div>
+          <div><h2>{content.headings.languages}</h2><ul>{content.languages.map((item) => <li key={item}>{item}</li>)}</ul></div>
         </div>
       </section>
 
-      <section id="experience" className="section">
-        <SectionIntro
-          eyebrow={content.sections.experience.eyebrow}
-          title={content.sections.experience.title}
-          text={content.sections.experience.text}
-        />
-
-        <div className="timeline">
-          {content.experience.map((item) => (
-            <article key={item.role} className="timeline-card">
-              <div className="timeline-card__top">
-                <h3>{item.role}</h3>
-                <span>{item.period}</span>
-              </div>
-
-              <ul className="check-list">
-                {item.bullets.map((bullet) => (
-                  <li key={bullet}>{bullet}</li>
-                ))}
-              </ul>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className="section section--muted">
-        <SectionIntro
-          eyebrow={content.sections.notes.eyebrow}
-          title={content.sections.notes.title}
-          text={content.sections.notes.text}
-        />
-
-        <div className="notes-card">
-          <ul className="check-list">
-            {content.notes.map((note) => (
-              <li key={note}>{note}</li>
-            ))}
-          </ul>
-        </div>
-      </section>
-
-      <section id="contact" className="section">
-        <div className="contact-card">
-          <div>
-            <p className="eyebrow">{content.sections.contact.eyebrow}</p>
-            <h2>{content.sections.contact.title}</h2>
-            <p>{content.sections.contact.text}</p>
-          </div>
-
-          <div className="contact-card__actions">
-            <a className="button" href={`mailto:${profileLinks.email}`}>
-              {content.sections.contact.emailButton}
-            </a>
-            <a className="button button--ghost" href={profileLinks.linkedin} target="_blank" rel="noreferrer">
-              {content.nav.linkedin}
-            </a>
-          </div>
-
-          <div className="contact-form-wrap">
-            <h3>{content.sections.contact.formTitle}</h3>
-            <p>{content.sections.contact.formDescription}</p>
-
-            <form
-              className="contact-form"
-              action={contactFormConfig.action}
-              method={contactFormConfig.method}
-              target="_blank"
-            >
-              <input type="hidden" name="_subject" value={content.sections.contact.formTitle} />
-
-              <div className="contact-form__grid">
-                <label className="contact-field">
-                  <span>{content.sections.contact.nameLabel}</span>
-                  <input
-                    type="text"
-                    name="name"
-                    placeholder={content.sections.contact.namePlaceholder}
-                    autoComplete="name"
-                    required
-                  />
-                </label>
-
-                <label className="contact-field">
-                  <span>{content.sections.contact.emailLabel}</span>
-                  <input
-                    type="email"
-                    name="email"
-                    placeholder={content.sections.contact.emailPlaceholder}
-                    autoComplete="email"
-                    required
-                  />
-                </label>
-              </div>
-
-              <label className="contact-field">
-                <span>{content.sections.contact.messageLabel}</span>
-                <textarea
-                  name="message"
-                  placeholder={content.sections.contact.messagePlaceholder}
-                  rows={5}
-                  required
-                />
-              </label>
-
-              <button type="submit" className="button button--ghost">
-                {content.sections.contact.submitButton}
-              </button>
-            </form>
+      <section className="section container contact" id="contact" aria-labelledby="contact-title">
+        <div className="contact__grid"><div><h2 id="contact-title">{content.headings.contact}</h2><p>{content.contact.intro}</p><p className="small-label">{content.contact.availability}</p></div>
+          <div className="contact__links">
+            <a href={`mailto:${profile.email}`}>{profile.email}<span aria-hidden="true"> ↗</span></a>
+            <a href={profile.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn<span aria-hidden="true"> ↗</span></a>
+            <a href={profile.github} target="_blank" rel="noopener noreferrer">GitHub<span aria-hidden="true"> ↗</span></a>
           </div>
         </div>
       </section>
     </main>
   );
 }
-
-export default HomePage;
