@@ -11,7 +11,7 @@ export type SiteTranslation = {
   experience: Experience[];
   capabilities: { label: string; detail: string }[];
   additionalIntro: string;
-  education: { degree: string; institution: string; detail: string; second: string };
+  education: { degree: string; institution: string; detail: string; second: string; certifications: string; hideCertifications: string; documents: { title: string; path: string; format: string }[] };
   languages: string[];
   contact: { intro: string; availability: string };
   projects: Project[];
@@ -71,7 +71,15 @@ export const translations: Record<Language, SiteTranslation> = {
       { label: "Bring-up & tooling", detail: "Oscilloscope, multimeter, bench supply, logic analyzer, sensors, JTAG/SWD · Linux, Git, Codex, Claude" }
     ],
     additionalIntro: "Mechanical CAD remains part of the build process: assemblies, drawings and hardware documentation for physical prototypes.",
-    education: { degree: "BSc, Engineering Physics", institution: "Universidad Nacional de Colombia", detail: "Completed Apr 2024 · Optoelectronics research using COMSOL · Teaching assistant for two years", second: "PCB Design & Fabrication · SENA, 2017" },
+    education: {
+      degree: "BSc, Engineering Physics", institution: "Universidad Nacional de Colombia", detail: "Completed Apr 2024 · Optoelectronics research using COMSOL · Teaching assistant for two years", second: "PCB Design & Fabrication · SENA, 2017",
+      certifications: "Certifications", hideCertifications: "Hide certifications",
+      documents: [
+        { title: "Engineering Physics degree diploma", path: "/certifications/engineering-physics-diploma.pdf", format: "PDF" },
+        { title: "PCB Design and Fabrication · SENA", path: "/certifications/sena-pcb-design.pdf", format: "PDF" },
+        { title: "TOEFL iBT score report", path: "/certifications/toefl-ibt-score-report.pdf", format: "PDF" }
+      ]
+    },
     languages: ["Spanish · Native", "English · C1 (TOEFL iBT)", "German · B1"],
     contact: { intro: "Available for selected part-time, contract and R&D collaborations in connected and physical systems.", availability: "Based in Medellín · Working internationally" },
     projects: projects.en
@@ -116,7 +124,15 @@ export const translations: Record<Language, SiteTranslation> = {
       { label: "Puesta en marcha y herramientas", detail: "Osciloscopio, multímetro, fuente de banco, analizador lógico, sensores, JTAG/SWD · Linux, Git, Codex, Claude" }
     ],
     additionalIntro: "El CAD mecánico sigue siendo parte del proceso: ensambles, planos y documentación de hardware para prototipos físicos.",
-    education: { degree: "Ingeniería Física", institution: "Universidad Nacional de Colombia", detail: "Graduado en abr 2024 · Investigación en optoelectrónica con COMSOL · Monitor académico durante dos años", second: "Diseño y Fabricación de Circuitos Impresos · SENA, 2017" },
+    education: {
+      degree: "Ingeniería Física", institution: "Universidad Nacional de Colombia", detail: "Graduado en abr 2024 · Investigación en optoelectrónica con COMSOL · Monitor académico durante dos años", second: "Diseño y Fabricación de Circuitos Impresos · SENA, 2017",
+      certifications: "Certificaciones", hideCertifications: "Ocultar certificaciones",
+      documents: [
+        { title: "Diploma de Ingeniería Física", path: "/certifications/engineering-physics-diploma.pdf", format: "PDF" },
+        { title: "Diseño y Elaboración de Circuitos Impresos · SENA", path: "/certifications/sena-pcb-design.pdf", format: "PDF" },
+        { title: "Reporte de resultados TOEFL iBT", path: "/certifications/toefl-ibt-score-report.pdf", format: "PDF" }
+      ]
+    },
     languages: ["Español · Nativo", "Inglés · C1 (TOEFL iBT)", "Alemán · B1"],
     contact: { intro: "Disponible para colaboraciones seleccionadas de medio tiempo, por contrato y de I+D en sistemas conectados y físicos.", availability: "En Medellín · Colaboración internacional" },
     projects: projects.es

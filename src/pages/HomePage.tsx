@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import ProjectMedia from "../components/ProjectMedia";
 import { profile, type Language, type SiteTranslation } from "../data/site";
@@ -24,6 +25,7 @@ function ProjectRow({ project, content, language }: { project: Project; content:
 }
 
 export default function HomePage({ language, content }: Props) {
+  const [certificationsOpen, setCertificationsOpen] = useState(false);
   const selected = content.projects.filter((project) => !project.secondary);
   const additional = content.projects.filter((project) => project.secondary);
   return (
@@ -81,7 +83,24 @@ export default function HomePage({ language, content }: Props) {
 
       <section className="section section--toned" id="education" aria-labelledby="education-title">
         <div className="container credentials">
-          <div><h2 id="education-title">{content.headings.education}</h2><h3>{content.education.degree}</h3><p>{content.education.institution}</p><p className="muted">{content.education.detail}</p><p className="muted">{content.education.second}</p></div>
+          <div>
+            <h2 id="education-title">{content.headings.education}</h2>
+            <h3>{content.education.degree}</h3>
+            <p>{content.education.institution}</p>
+            <p className="muted">{content.education.detail}</p>
+            <p className="muted">{content.education.second}</p>
+            <button className="certifications-toggle" type="button" aria-expanded={certificationsOpen} aria-controls="certifications-list" onClick={() => setCertificationsOpen(!certificationsOpen)}>
+              {certificationsOpen ? content.education.hideCertifications : content.education.certifications}
+              <span aria-hidden="true"> {certificationsOpen ? "−" : "+"}</span>
+            </button>
+            <div className="certifications-list" id="certifications-list" hidden={!certificationsOpen}>
+              {content.education.documents.map((document) => (
+                <a key={document.path} href={document.path} target="_blank" rel="noopener noreferrer">
+                  <span>{document.title}</span><span className="small-label">{document.format} ↗</span>
+                </a>
+              ))}
+            </div>
+          </div>
           <div><h2>{content.headings.languages}</h2><ul>{content.languages.map((item) => <li key={item}>{item}</li>)}</ul></div>
         </div>
       </section>
