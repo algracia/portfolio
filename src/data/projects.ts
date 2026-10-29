@@ -97,10 +97,10 @@ const copy: Record<Language, Record<ProjectId, ProjectCopy>> = {
     },
     chessproject: {
       title: "ChessProject — Autonomous Chessboard", period: "2023 – 2024", category: "Embedded systems / Mechatronics",
-      summary: "An electromechanical chessboard that executes moves through XY motion, stepper motors and a servo-lift electromagnet.",
-      contribution: "I developed STM32/HAL firmware in C and integrated the motion hardware, interconnect PCB and Python/Flask software.",
-      scope: ["Timers generate stepper motion; PWM drives the servo; endstops support homing and travel limits.", "USART2 links the motion controller to a Python/Flask application using Stockfish and python-chess.", "The prototype joins mechanical motion, PCB interconnects, power and software into a working physical board."],
-      stack: ["STM32 / HAL", "C", "Timers / PWM", "Steppers & servo", "Endstops", "USART2", "Python / Flask", "Stockfish / python-chess"]
+      summary: "An electromechanical chessboard combining XY motion with a playing surface designed for laser cutting and engraving.",
+      contribution: "I designed the playing surface for laser cutting and engraving, developed STM32/HAL firmware in C and integrated the motion hardware, interconnect PCB and Python/Flask software.",
+      scope: ["Prepared the playing surface design for laser cutting and engraving.", "Timers generate stepper motion; PWM drives the servo; endstops support homing and travel limits.", "USART2 links the motion controller to a Python/Flask application using Stockfish and python-chess.", "The prototype joins mechanical motion, PCB interconnects, power and software into a working physical board."],
+      stack: ["Mechanical CAD", "Laser cutting & engraving", "STM32 / HAL", "C", "Timers / PWM", "Steppers & servo", "Endstops", "USART2", "Python / Flask", "Stockfish / python-chess"]
     },
     "cad-assemblies": {
       title: "Mechanical CAD Assemblies", period: "Selected CAD work", category: "Mechanical CAD / Documentation",
@@ -127,10 +127,10 @@ const copy: Record<Language, Record<ProjectId, ProjectCopy>> = {
     },
     chessproject: {
       title: "ChessProject — Tablero de ajedrez autónomo", period: "2023 – 2024", category: "Sistemas embebidos / Mecatrónica",
-      summary: "Tablero electromecánico que ejecuta movimientos con un sistema XY, motores paso a paso y electroimán elevado por servo.",
-      contribution: "Desarrollé firmware en C sobre STM32/HAL e integré el mecanismo de movimiento, la PCB de interconexión y el software Python/Flask.",
-      scope: ["Los timers generan el movimiento de steppers; PWM controla el servo; endstops permiten homing y límites de recorrido.", "USART2 comunica el controlador con una aplicación Python/Flask que usa Stockfish y python-chess.", "El prototipo integra movimiento mecánico, PCB, alimentación y software en un tablero físico funcional."],
-      stack: ["STM32 / HAL", "C", "Timers / PWM", "Steppers y servo", "Endstops", "USART2", "Python / Flask", "Stockfish / python-chess"]
+      summary: "Tablero electromecánico que combina movimiento XY con una superficie de juego diseñada para corte y grabado láser.",
+      contribution: "Diseñé la superficie de juego para corte y grabado láser, desarrollé firmware en C sobre STM32/HAL e integré el mecanismo de movimiento, la PCB de interconexión y el software Python/Flask.",
+      scope: ["Preparé el diseño de la superficie de juego para corte y grabado láser.", "Los timers generan el movimiento de steppers; PWM controla el servo; endstops permiten homing y límites de recorrido.", "USART2 comunica el controlador con una aplicación Python/Flask que usa Stockfish y python-chess.", "El prototipo integra movimiento mecánico, PCB, alimentación y software en un tablero físico funcional."],
+      stack: ["CAD mecánico", "Corte y grabado láser", "STM32 / HAL", "C", "Timers / PWM", "Steppers y servo", "Endstops", "USART2", "Python / Flask", "Stockfish / python-chess"]
     },
     "cad-assemblies": {
       title: "Ensambles CAD mecánicos", period: "Trabajos CAD", category: "CAD mecánico / Documentación",
